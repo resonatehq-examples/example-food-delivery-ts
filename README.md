@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.png" alt="Food Delivery — Resonate example" />
+</p>
+
 # Food Delivery Workflow
 
 A multi-step food delivery pipeline with durable crash recovery. Models a full delivery: order placed → kitchen prepares → driver assigned → pickup → delivery → complete.
