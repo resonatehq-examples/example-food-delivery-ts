@@ -129,23 +129,13 @@ example-food-delivery-ts/
 
 **Lines of code**: ~180 total, ~60 lines of actual logic.
 
-## Comparison
+## Why the workflow is the delivery
 
-Temporal's food delivery example ([github](https://github.com/temporalio/samples-typescript/tree/main/food-delivery)) is a Turborepo monorepo with 116 files across 3 apps (customer menu, driver portal, worker). It uses Signals for driver updates and Queries for state. Restate's food ordering ([github](https://github.com/restatedev/examples/tree/main/end-to-end-applications/typescript/food-ordering)) uses 5 virtual objects and Kafka, running in Docker Compose with 7 containers.
+The end-to-end delivery flow — order → kitchen → driver → pickup → delivery — lives in a single generator function. Each step is a `ctx.run()` that durably records its result. Crash at any point, restart, and the workflow resumes from the first uncompleted step; prior steps are replayed from the promise store without re-invoking side effects.
 
-| | Resonate | Temporal | Restate |
-|---|---|---|---|
-| Source files | 3 | 10+ (plus monorepo) | 15+ |
-| Total files | ~10 | 116 | 153 |
-| External services | None | Temporal server | Restate server + Kafka + Jaeger |
-| Setup | `bun install && bun start` | pnpm + Turborepo + Temporal server | Docker Compose (7 containers) |
-| Crash recovery model | Built-in retries on `ctx.run` | Activity retries (configured per-activity) | Side-effect retries via `ctx.run` |
-| External events | (not needed here) | Signals | Promises / Awakeables |
-
-Both Temporal and Restate are production-grade platforms with rich feature sets. Resonate's advantage is the minimal ceremony to demonstrate the same core pattern.
+No signal registration for driver updates, no query handlers for state, no separate task services for each stage. The linear generator IS the delivery lifecycle. For scenarios where asynchronous external events must push into the workflow mid-flight (live driver-location updates, customer cancellations), see [example-human-in-the-loop-ts](https://github.com/resonatehq-examples/example-human-in-the-loop-ts).
 
 ## Learn More
 
 - [Resonate documentation](https://docs.resonatehq.io)
-- [Temporal food-delivery example](https://github.com/temporalio/samples-typescript/tree/main/food-delivery)
-- [Restate food-ordering example](https://github.com/restatedev/examples/tree/main/end-to-end-applications/typescript/food-ordering)
+- [Human-in-the-loop pattern](https://github.com/resonatehq-examples/example-human-in-the-loop-ts) — pushing async events into a running workflow
