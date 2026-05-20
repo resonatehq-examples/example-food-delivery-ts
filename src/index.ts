@@ -43,3 +43,5 @@ const result = await resonate.run(
 
 console.log("\n=== Result ===");
 console.log(JSON.stringify(result, null, 2));
+
+resonate.stop();
